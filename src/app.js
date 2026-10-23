@@ -1,6 +1,7 @@
 import { TONOS, TIPOS_PIEL, buscarTono, perfilCompleto } from './perfil.js';
 import { RECORRIDO, cargarPasos, primerPaso, siguientePaso, numeroDePaso } from './recorrido.js';
 import { crearAvatar } from './avatar.js';
+import { encenderLuces } from './espejo.js';
 
 const $ = (selector) => document.querySelector(selector);
 const menosMovimiento = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -27,25 +28,6 @@ async function decir(texto) {
     await new Promise((resolver) => setTimeout(resolver, 22));
   }
   if (turno === turnoDeHabla) avatar.hablar(false);
-}
-
-// ---------- Luces del espejo ----------
-
-function encenderLuces() {
-  const contenedor = $('#luces');
-  const lado = [88, 72, 56];
-  const arco = [180, 150, 120, 90, 60, 30, 0].map((grados) => {
-    const rad = (grados * Math.PI) / 180;
-    return [50 + 50 * Math.cos(rad), 40 - 40 * Math.sin(rad)];
-  });
-  const posiciones = [
-    ...lado.map((y) => [0, y]),
-    ...arco,
-    ...[...lado].reverse().map((y) => [100, y])
-  ];
-  contenedor.innerHTML = posiciones
-    .map(([x, y], i) => `<span class="bombilla" style="left:${x}%;top:${y}%;animation-delay:${i * 70}ms"></span>`)
-    .join('');
 }
 
 // ---------- Pantalla de inicio ----------
@@ -124,6 +106,7 @@ function mostrarPaso(id) {
   avatar.efecto(paso.efecto ?? null);
   avatar.guia(paso.guia ?? null);
   $('#leyenda').hidden = !paso.guia;
+  $('#repetir').hidden = !paso.aplicar;
   paso.aplicar?.(avatar, estado.perfil);
   decir(paso.mensaje(estado.perfil));
   $('#paso-titulo').focus();
@@ -161,7 +144,7 @@ function mostrarCierre(ultimo, siguiente) {
 // ---------- Arranque ----------
 
 async function iniciar() {
-  encenderLuces();
+  encenderLuces($('#luces'));
   pintarOpciones();
   estado.pasos = await cargarPasos();
 
@@ -175,6 +158,9 @@ async function iniciar() {
     if (perfilCompleto(estado.perfil) && id) mostrarPaso(id);
   });
   $('#terminar').addEventListener('click', terminarPaso);
+  $('#repetir').addEventListener('click', () => {
+    estado.pasos.get(estado.actual)?.aplicar?.(avatar, estado.perfil);
+  });
   $('#reiniciar').addEventListener('click', mostrarInicio);
   $('#volver').addEventListener('click', mostrarInicio);
 

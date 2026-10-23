@@ -20,6 +20,7 @@ rules:
   tasks:
     - Cada tarea indica cómo se verifica (un test o algo visible en el avatar)
     - Para un paso nuevo, crea solo src/pasos/<id>.js y su test; no edites otros pasos
+    - Los pasos de maquillaje aplican su producto con avatar.difuminar dentro de aplicar; no dibujes ni animes nada nuevo
 
 # Per-operation guidance (optional)
 # Add advisory guidance for how apply and archive work should be conducted.

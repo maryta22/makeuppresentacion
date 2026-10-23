@@ -8,10 +8,13 @@ HTML, CSS y JavaScript (módulos ES) sin frameworks ni dependencias.
 ## Comandos
 - Probar: `npm test` (usa `node:test`)
 - Ejecutar: `npm start` y abrir http://localhost:3000
+- Revisar el maquillaje: http://localhost:3000/vista-previa.html aplica y difumina cada producto en cualquier tono
 
 ## Estructura
 - `index.html`, `estilos.css`: las dos pantallas (inicio y paso) y el espejo.
+- `vista-previa.html`, `src/vista-previa.js`: página de apoyo para probar el maquillaje del avatar.
 - `src/app.js`: estado y navegación entre pantallas.
+- `src/espejo.js`: las luces del espejo.
 - `src/perfil.js`: tonos de rostro y tipos de piel.
 - `src/recorrido.js`: el orden de los pasos. Un paso sin archivo aparece como "próximamente" y se salta.
 - `src/avatar.js`: el avatar en SVG y su API.
@@ -25,9 +28,12 @@ HTML, CSS y JavaScript (módulos ES) sin frameworks ni dependencias.
    - `consejos(perfil)`: lista de consejos
    - `recomendacion(perfil)`: `{ titulo, texto }`, adaptada al tipo de piel o al tono
    - `guia`: el id del paso. Muestra sobre el avatar dónde aplicar y hacia dónde difuminar; las señalizaciones de los 12 pasos ya existen en `src/avatar.js`
-   - Opcionales: `efecto` (efecto continuo del avatar), `alTerminar` (destello al terminar), `aplicar(avatar, perfil)` (maquillaje que queda puesto), `logro` (frase al cerrar)
+   - `aplicar(avatar, perfil)`: en los pasos de maquillaje, aplica el producto con `avatar.difuminar`
+   - Opcionales: `efecto` (efecto continuo del avatar), `alTerminar` (destello al terminar), `logro` (frase al cerrar)
 3. Para maquillar al avatar usa su API, sin editar el SVG:
-   - `avatar.capa(nombre, { color, opacidad, grosor })` con las capas `base`, `brillo`, `bronceador`, `iluminador`, `rubor`, `cejas`, `sombra`, `pestanas`, `labios`
+   - `avatar.difuminar(capa, { color, opacidad, grosor })`: aplica el producto con la animación completa (manchas en los puntos, brocha que sigue las flechas de la señalización y producto que se funde con la piel). Es lo que deben usar los pasos de maquillaje. Ejemplo: `aplicar: (avatar) => avatar.difuminar('rubor', { color: '#E36F7E', opacidad: 0.6 })`
+   - `avatar.capa(nombre, { color, opacidad, grosor })`: lo mismo pero sin animación
+   - Capas: `base`, `brillo`, `bronceador`, `iluminador`, `rubor`, `cejas`, `sombra`, `pestanas`, `labios`
    - Efectos continuos (`efecto`): `espuma`, `bruma`
    - Destellos que se reproducen una vez (`alTerminar`): `enjuague`, `brillo`, `bruma`
 4. Agrega `test/<id>.test.js` con un test por escenario de la spec. `test/contrato-pasos.test.js` valida el contrato automáticamente.

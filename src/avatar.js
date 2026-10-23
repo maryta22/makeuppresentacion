@@ -2,7 +2,8 @@
 //   avatar.tono('#D7A07A')                        tono de piel
 //   avatar.efecto('espuma') / avatar.efecto(null)  efecto continuo mientras dura un paso
 //   await avatar.destello('enjuague')              efecto breve que se reproduce una vez
-//   avatar.capa('labios', { color: '#B3314A' })    maquillaje que se queda puesto
+//   avatar.capa('labios', { color: '#B3314A' })    maquillaje que se queda puesto, sin animación
+//   await avatar.difuminar('rubor', { color })     aplica el producto con una brocha y lo difumina
 //   avatar.guia('bronceador') / avatar.guia(null)  señaliza dónde aplicar y hacia dónde difuminar
 //   avatar.hablar(true | false)                    mueve la boca mientras habla
 //
@@ -11,6 +12,52 @@
 // Guías: una por cada paso del recorrido (ver GUIAS).
 
 const CAPAS = ['base', 'brillo', 'bronceador', 'iluminador', 'rubor', 'cejas', 'sombra', 'pestanas', 'labios'];
+
+// ---------- Difuminado ----------
+// Para cada capa: qué señalización recorre la brocha y si el producto se extiende al difuminarse.
+const DIFUMINADO = {
+  base: { guia: 'base' },
+  brillo: { guia: 'iluminador', expandir: true },
+  bronceador: { guia: 'bronceador', expandir: true },
+  iluminador: { guia: 'iluminador', expandir: true },
+  rubor: { guia: 'rubor', expandir: true },
+  sombra: { guia: 'sombra-ojos', expandir: true },
+  cejas: { guia: 'cejas' },
+  pestanas: { guia: 'pestanas' },
+  labios: { guia: 'labial' }
+};
+
+const COLOR_POR_DEFECTO = {
+  base: 'var(--piel-sombra)',
+  brillo: '#FFF6EA',
+  bronceador: 'color-mix(in srgb, var(--piel) 60%, #7A4128)',
+  iluminador: '#FFF3DC',
+  rubor: '#E36F7E',
+  sombra: '#9B6B8E',
+  cejas: 'var(--ceja-natural)',
+  pestanas: '#140C0A',
+  labios: 'var(--labios-natural)'
+};
+
+const limitar = (valor) => Math.min(1, Math.max(0, valor));
+
+// Cómo se ve el difuminado en el instante t (0 = inicio, 1 = final):
+// primero aparecen manchas de producto, luego la brocha las extiende hasta fundirlas con la piel.
+export function etapaDifuminado(t) {
+  const x = limitar(t);
+  const aparicion = limitar(x / 0.15);
+  const avance = limitar((x - 0.15) / 0.85);
+  const suave = avance * avance * (3 - 2 * avance);
+  return {
+    manchas: aparicion * (1 - suave),
+    manchasTamano: (0.4 + 0.6 * aparicion) * (1 + 1.4 * suave),
+    capa: suave,
+    tamano: 0.45 + 0.55 * suave,
+    desenfoque: 0.2 + 0.8 * suave,
+    brocha: avance,
+    brochaVisible: Math.min(limitar((x - 0.06) / 0.1), limitar((1 - x) / 0.06))
+  };
+}
 
 // ---------- Señalizaciones ----------
 // Coordenadas del lado izquierdo del rostro; `simetrico` las refleja al lado derecho.
@@ -124,6 +171,11 @@ const SVG = `
     </radialGradient>
     <filter id="ID-suavizado" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="5" /></filter>
     <filter id="ID-suavizado-fino" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.5" /></filter>
+    <filter id="ID-difuminado-bronceador" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="5" /></filter>
+    <filter id="ID-difuminado-rubor" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="5" /></filter>
+    <filter id="ID-difuminado-iluminador" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.5" /></filter>
+    <filter id="ID-difuminado-sombra" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.5" /></filter>
+    <filter id="ID-mancha" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.3" /></filter>
     <filter id="ID-sombra-suave" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="7" /></filter>
     <filter id="ID-halo" x="-20%" y="-20%" width="140%" height="140%">
       <feMorphology in="SourceAlpha" operator="dilate" radius="1.2" result="grueso" />
@@ -179,7 +231,7 @@ const SVG = `
     <ellipse cx="160" cy="182" rx="6" ry="16" fill="url(#ID-g-luz)" />
   </g>
 
-  <g class="capa-bronceador" filter="url(#ID-suavizado)" clip-path="url(#ID-recorte-rostro)">
+  <g class="capa-bronceador" filter="url(#ID-difuminado-bronceador)" clip-path="url(#ID-recorte-rostro)">
     <ellipse cx="96" cy="218" rx="20" ry="7" transform="rotate(-24 96 218)" />
     <ellipse cx="224" cy="218" rx="20" ry="7" transform="rotate(24 224 218)" />
     <ellipse cx="80" cy="128" rx="9" ry="22" />
@@ -188,12 +240,12 @@ const SVG = `
     <ellipse cx="196" cy="262" rx="22" ry="6" transform="rotate(-28 196 262)" />
   </g>
 
-  <g class="capa-rubor" filter="url(#ID-suavizado)" clip-path="url(#ID-recorte-rostro)">
+  <g class="capa-rubor" filter="url(#ID-difuminado-rubor)" clip-path="url(#ID-recorte-rostro)">
     <ellipse cx="108" cy="204" rx="22" ry="13" />
     <ellipse cx="212" cy="204" rx="22" ry="13" />
   </g>
 
-  <g class="capa-iluminador" filter="url(#ID-suavizado-fino)" clip-path="url(#ID-recorte-rostro)">
+  <g class="capa-iluminador" filter="url(#ID-difuminado-iluminador)" clip-path="url(#ID-recorte-rostro)">
     <ellipse cx="116" cy="184" rx="15" ry="5" transform="rotate(-12 116 184)" />
     <ellipse cx="204" cy="184" rx="15" ry="5" transform="rotate(12 204 184)" />
     <ellipse cx="160" cy="176" rx="3" ry="13" />
@@ -202,7 +254,7 @@ const SVG = `
     <ellipse cx="198" cy="140" rx="12" ry="3" />
   </g>
 
-  <g class="capa-sombra" filter="url(#ID-suavizado-fino)">
+  <g class="capa-sombra" filter="url(#ID-difuminado-sombra)">
     <path d="M98 157 C104 136 136 134 146 156 C134 146 110 146 98 157 Z" />
     <path d="M222 157 C216 136 184 134 174 156 C186 146 210 146 222 157 Z" />
   </g>
@@ -297,7 +349,17 @@ const SVG = `
     <path class="destello" transform="translate(206 250)" d="M0 -7 L2 -2 L7 0 L2 2 L0 7 L-2 2 L-7 0 L-2 -2 Z" />
   </g>
 
+  <g class="manchas" filter="url(#ID-mancha)"></g>
+
   <g class="guias" filter="url(#ID-halo)">${SVG_GUIAS}</g>
+
+  <g class="brocha" aria-hidden="true">
+    <path class="brocha-mango" d="M-4.5 -34 L-3 -92 Q0 -96 3 -92 L4.5 -34 Z" />
+    <path class="brocha-reflejo" d="M-1.6 -40 L-1 -86" />
+    <rect class="brocha-virola" x="-6.5" y="-36" width="13" height="12" rx="2" />
+    <path class="brocha-pelo" d="M0 1 C-10 -1 -11 -16 -6.5 -24.5 L6.5 -24.5 C11 -16 10 -1 0 1 Z" />
+    <path class="brocha-punta" d="M0 1 C-8.5 -0.5 -9.8 -7 -9.4 -10 L9.4 -10 C9.8 -7 8.5 -0.5 0 1 Z" />
+  </g>
 </svg>`;
 
 const esperar = (ms) => new Promise((resolver) => setTimeout(resolver, ms));
@@ -313,6 +375,100 @@ export function crearAvatar(contenedor) {
   const quitarClases = (prefijo) => {
     [...raiz.classList].filter((clase) => clase.startsWith(prefijo)).forEach((clase) => raiz.classList.remove(clase));
   };
+
+  // ---------- Difuminado animado ----------
+
+  const brocha = raiz.querySelector('.brocha');
+  const manchas = raiz.querySelector('.manchas');
+  const formas = {};
+  const desenfoques = {};
+  for (const nombre of CAPAS) {
+    const grupo = raiz.querySelector(`g.capa-${nombre}`);
+    formas[nombre] = grupo ? [...grupo.querySelectorAll('ellipse, path')] : [];
+    for (const forma of formas[nombre]) {
+      if (forma.tagName === 'ellipse') Object.assign(forma.dataset, { rx: forma.getAttribute('rx'), ry: forma.getAttribute('ry') });
+    }
+    const desenfoque = raiz.querySelector(`#${idUnico}-difuminado-${nombre} feGaussianBlur`);
+    if (desenfoque) {
+      desenfoque.dataset.base = desenfoque.getAttribute('stdDeviation');
+      desenfoques[nombre] = desenfoque;
+    }
+  }
+
+  // Lleva un punto del espacio de un elemento (por ejemplo, un lado reflejado) al espacio del avatar.
+  const aRaiz = (elemento, x, y) =>
+    new DOMPoint(x, y).matrixTransform(raiz.getScreenCTM().inverse().multiply(elemento.getScreenCTM()));
+
+  function recorridoDeGuia(nombreGuia) {
+    const grupo = raiz.querySelector(`.guia[data-guia="${nombreGuia}"]`);
+    if (!grupo) return { flechas: [], puntos: [] };
+    const flechas = [...grupo.querySelectorAll('.flecha')].map((trazo) => {
+      const largo = trazo.getTotalLength();
+      return (t) => {
+        const p = trazo.getPointAtLength(largo * t);
+        return aRaiz(trazo, p.x, p.y);
+      };
+    });
+    const puntos = [...grupo.querySelectorAll('.punto')]
+      .map((punto) => aRaiz(punto, Number(punto.getAttribute('cx')), Number(punto.getAttribute('cy'))));
+    return { flechas, puntos: puntos.length ? puntos : flechas.map((flecha) => flecha(0)) };
+  }
+
+  function moverBrocha(flechas, avance) {
+    const tramos = flechas.length;
+    const tramo = Math.min(tramos - 1, Math.floor(avance * tramos));
+    const local = avance * tramos - tramo;
+    const p = flechas[tramo](local);
+    const q = flechas[tramo](Math.min(1, local + 0.02));
+    const largo = Math.hypot(q.x - p.x, q.y - p.y) || 1;
+    const vaiven = Math.sin(local * Math.PI * 8) * 2.4;
+    const x = p.x - ((q.y - p.y) / largo) * vaiven;
+    const y = p.y + ((q.x - p.x) / largo) * vaiven;
+    const giro = x < 160 ? -32 : 32;
+    brocha.setAttribute('transform', `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${giro}) scale(0.8)`);
+  }
+
+  function pintarEtapa(nombre, etapa, opacidad) {
+    if (nombre === 'labios') raiz.style.setProperty('--capa-labios-mezcla', etapa.capa.toFixed(3));
+    else if (nombre !== 'cejas') raiz.style.setProperty(`--capa-${nombre}-opacidad`, (opacidad * etapa.capa).toFixed(3));
+    if (DIFUMINADO[nombre].expandir) {
+      for (const forma of formas[nombre]) {
+        if (forma.tagName === 'ellipse') {
+          forma.setAttribute('rx', (forma.dataset.rx * etapa.tamano).toFixed(2));
+          forma.setAttribute('ry', (forma.dataset.ry * etapa.tamano).toFixed(2));
+        } else {
+          forma.style.transform = `scale(${etapa.tamano.toFixed(3)})`;
+        }
+      }
+    }
+    const desenfoque = desenfoques[nombre];
+    if (desenfoque) desenfoque.setAttribute('stdDeviation', (desenfoque.dataset.base * etapa.desenfoque).toFixed(2));
+    manchas.style.opacity = etapa.manchas.toFixed(3);
+    for (const mancha of manchas.children) mancha.setAttribute('r', (6.5 * etapa.manchasTamano).toFixed(2));
+  }
+
+  function restaurarFormas(nombre) {
+    for (const forma of formas[nombre]) {
+      if (forma.tagName === 'ellipse') {
+        forma.setAttribute('rx', forma.dataset.rx);
+        forma.setAttribute('ry', forma.dataset.ry);
+      } else {
+        forma.style.transform = '';
+      }
+    }
+    const desenfoque = desenfoques[nombre];
+    if (desenfoque) desenfoque.setAttribute('stdDeviation', desenfoque.dataset.base);
+  }
+
+  let enCurso = null;
+
+  // Termina de inmediato el difuminado que esté en marcha, dejando el producto ya difuminado.
+  function detener() {
+    if (!enCurso) return;
+    enCurso.ejecucion.cancelada = true;
+    enCurso.terminar();
+    enCurso = null;
+  }
 
   const api = {
     tono(color) {
@@ -337,8 +493,68 @@ export function crearAvatar(contenedor) {
       raiz.style.setProperty(`--capa-${nombre}-opacidad`, String(opacidad));
     },
 
+    // Aplica el producto como un tutorial: manchas en los puntos de la señalización,
+    // una brocha que recorre las flechas y el producto que se extiende hasta fundirse con la piel.
+    async difuminar(nombre, { color, opacidad = 1, grosor, guia, duracion = 2600 } = {}) {
+      if (!CAPAS.includes(nombre)) throw new Error(`Capa desconocida: ${nombre}`);
+      detener();
+
+      const terminar = () => {
+        manchas.replaceChildren();
+        brocha.style.opacity = '0';
+        restaurarFormas(nombre);
+        raiz.classList.remove('difuminando');
+        raiz.style.removeProperty('--capa-labios-mezcla');
+        api.capa(nombre, { color, opacidad, grosor });
+      };
+      if (menosMovimiento()) {
+        terminar();
+        return;
+      }
+
+      const tinte = color ?? COLOR_POR_DEFECTO[nombre];
+      const { flechas, puntos } = recorridoDeGuia(guia ?? DIFUMINADO[nombre].guia);
+      raiz.classList.add('difuminando');
+      pintarEtapa(nombre, etapaDifuminado(0), opacidad);
+      if (color) raiz.style.setProperty(`--capa-${nombre}-color`, color);
+      manchas.innerHTML = puntos
+        .map((p) => `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="2" style="fill: ${tinte}" />`)
+        .join('');
+      brocha.querySelector('.brocha-punta').style.fill = tinte;
+
+      const ejecucion = { cancelada: false };
+      enCurso = { ejecucion, terminar };
+      let cejasPuestas = false;
+      const inicio = performance.now();
+
+      await new Promise((resolver) => {
+        const cuadro = (ahora) => {
+          if (ejecucion.cancelada) return resolver();
+          const t = (ahora - inicio) / duracion;
+          if (t >= 1) {
+            terminar();
+            enCurso = null;
+            return resolver();
+          }
+          const etapa = etapaDifuminado(t);
+          pintarEtapa(nombre, etapa, opacidad);
+          if (nombre === 'cejas' && !cejasPuestas && etapa.capa > 0.35) {
+            cejasPuestas = true;
+            api.capa('cejas', { color, opacidad, grosor });
+          }
+          if (flechas.length) {
+            moverBrocha(flechas, etapa.brocha);
+            brocha.style.opacity = etapa.brochaVisible.toFixed(3);
+          }
+          requestAnimationFrame(cuadro);
+        };
+        requestAnimationFrame(cuadro);
+      });
+    },
+
     guia(nombre) {
       if (nombre && !GUIAS.includes(nombre)) throw new Error(`Guía desconocida: ${nombre}`);
+      if (!nombre) detener();
       raiz.querySelectorAll('.guia').forEach((grupo) => grupo.classList.toggle('activa', grupo.dataset.guia === nombre));
     },
 
@@ -347,12 +563,13 @@ export function crearAvatar(contenedor) {
     },
 
     reiniciar() {
+      detener();
       quitarClases('efecto-');
       quitarClases('destello-');
       raiz.classList.remove('hablando');
       api.guia(null);
       CAPAS.forEach((nombre) => {
-        ['color', 'opacidad', 'grosor'].forEach((prop) => raiz.style.removeProperty(`--capa-${nombre}-${prop}`));
+        ['color', 'opacidad', 'grosor', 'mezcla'].forEach((prop) => raiz.style.removeProperty(`--capa-${nombre}-${prop}`));
       });
     }
   };

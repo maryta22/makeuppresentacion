@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tocador · Vista previa del avatar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gloock&family=Figtree:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="estilos.css">
+  <script type="module" src="src/vista-previa.js"></script>
+</head>
+<body data-pantalla="paso">
+  <div class="app">
+    <header class="cabecera">
+      <p class="marca">Tocador</p>
+      <a class="enlace" href="index.html">Ir al tutorial</a>
+    </header>
+
+    <main class="escenario">
+      <section class="tocador" aria-label="Espejo">
+        <div class="espejo">
+          <div id="luces" class="espejo__luces" aria-hidden="true"></div>
+          <div class="espejo__vidrio">
+            <div id="avatar" class="espejo__avatar"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h1 class="titulo">Vista previa</h1>
+        <p class="intro">Prueba cómo se aplica y se difumina cada producto sobre el avatar. Es una página de apoyo para construir los pasos; el tutorial está en la página principal.</p>
+        <fieldset class="grupo">
+          <legend>Tono del rostro</legend>
+          <div id="tonos" class="tonos"></div>
+        </fieldset>
+        <fieldset class="grupo">
+          <legend>Aplicar y difuminar</legend>
+          <div id="productos" class="productos"></div>
+        </fieldset>
+        <button id="quitar" class="boton" type="button">Quitar el maquillaje</button>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

@@ -16,8 +16,13 @@ npm start    # http://localhost:3000
 ## Qué hay hoy
 
 - **Inicio:** elegir el tono del rostro y el tipo de piel; el avatar cambia de tono al instante.
-- **Paso 1, limpieza:** el avatar explica cómo limpiar el rostro, recomienda un limpiador según el tipo de piel y muestra espuma en círculos y el enjuague.
-- **Recorrido:** los ocho pasos de la rutina; los que todavía no existen aparecen como "próximamente".
+- **Paso 1, limpieza:** el avatar explica cómo limpiar el rostro, recomienda un limpiador según el tipo de piel y muestra espuma, flechas de movimiento circular y el enjuague.
+- **Recorrido:** los doce pasos de la rutina; los que todavía no existen aparecen como "próximamente".
+- **Avatar listo para maquillar:** cada paso tiene su señalización (dónde aplicar y hacia dónde difuminar) y la animación de brocha que difumina el producto.
+
+## Vista previa del maquillaje
+
+Con `npm start`, abre http://localhost:3000/vista-previa.html para ver cómo se aplica y se difumina cada producto (base, bronceador, iluminador, rubor, cejas, sombra, pestañas y labial) en cualquier tono de piel.
 
 ## Cómo crece
 
