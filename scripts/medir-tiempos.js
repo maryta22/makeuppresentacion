@@ -2,7 +2,7 @@
 // de tres formas, cada una en copias limpias del repo (git worktree):
 //
 //   secuencial  uno por uno: un `codex exec` por cambio, uno después de otro
-//   paralelo    los tres a la vez: un `codex exec` por cambio, al mismo tiempo
+//   paralelo    en paralelo: un `codex exec` por cambio, todos al mismo tiempo
 //   equipo      un solo `codex exec "$equipo"`: Codex reparte el trabajo a sus subagentes
 //
 // De cada forma guarda el tiempo, los tokens que reporta Codex, si las pruebas
@@ -27,7 +27,7 @@ import { revisarTrazabilidad } from './trazabilidad.js';
 
 const MODOS = {
   secuencial: 'Uno por uno',
-  paralelo: 'Los tres a la vez',
+  paralelo: 'En paralelo',
   equipo: 'El equipo ($equipo)'
 };
 
