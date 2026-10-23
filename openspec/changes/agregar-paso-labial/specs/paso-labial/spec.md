@@ -1,3 +1,6 @@
+## Purpose
+Undécimo paso de la rutina: aplicar el labial en un color que realce el tono de piel.
+
 ## ADDED Requirements
 
 ### Requirement: Guiar el labial

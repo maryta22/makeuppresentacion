@@ -1,3 +1,6 @@
+## Purpose
+Séptimo paso de la rutina: aplicar el rubor en el tono y la fórmula adecuados para el tono y el tipo de piel.
+
 ## ADDED Requirements
 
 ### Requirement: Guiar el rubor
