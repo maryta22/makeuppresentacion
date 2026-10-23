@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tocador · Tutorial de maquillaje en vivo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gloock&family=Figtree:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="estilos.css">
+  <script type="module" src="src/app.js"></script>
+</head>
+<body data-pantalla="inicio">
+  <div class="app">
+    <header class="cabecera">
+      <p class="marca">Tocador</p>
+      <button id="reiniciar" class="enlace" type="button" hidden>Empezar de nuevo</button>
+    </header>
+
+    <nav id="recorrido" class="recorrido" aria-label="Pasos de la rutina" hidden>
+      <ol id="recorrido-lista"></ol>
+    </nav>
+
+    <main class="escenario">
+      <section class="tocador" aria-label="Espejo">
+        <div class="espejo">
+          <div id="luces" class="espejo__luces" aria-hidden="true"></div>
+          <div class="espejo__vidrio">
+            <div id="avatar" class="espejo__avatar"></div>
+          </div>
+        </div>
+        <div class="globo">
+          <p id="globo-texto" class="globo__texto" aria-hidden="true"></p>
+          <p id="globo-lector" class="solo-lector" aria-live="polite"></p>
+        </div>
+      </section>
+
+      <section id="panel-inicio" class="panel">
+        <h1 class="titulo">Empecemos</h1>
+        <p class="intro">Tu rutina de maquillaje, paso a paso y en vivo. Primero cuéntame cómo es tu piel.</p>
+        <form id="perfil">
+          <fieldset class="grupo">
+            <legend>Elige el tono de tu rostro <span id="tono-elegido" class="grupo__valor"></span></legend>
+            <div id="tonos" class="tonos"></div>
+          </fieldset>
+          <fieldset class="grupo">
+            <legend>¿Cómo es tu piel?</legend>
+            <div id="tipos" class="tipos"></div>
+          </fieldset>
+          <button id="comenzar" class="boton" type="submit" disabled>Comenzar la rutina</button>
+          <p id="pista" class="pista">Elige un tono y tu tipo de piel para comenzar.</p>
+        </form>
+      </section>
+
+      <section id="panel-paso" class="panel" hidden>
+        <p id="paso-numero" class="paso__numero"></p>
+        <h2 id="paso-titulo" class="titulo" tabindex="-1"></h2>
+        <h3 class="subtitulo">Cómo hacerlo</h3>
+        <ul id="paso-consejos" class="consejos"></ul>
+        <div class="etiqueta">
+          <p id="etiqueta-titulo" class="etiqueta__titulo"></p>
+          <p id="etiqueta-texto" class="etiqueta__texto"></p>
+        </div>
+        <p class="nota">Son consejos generales. Si tienes alguna condición en la piel, consulta a un dermatólogo.</p>
+        <button id="terminar" class="boton" type="button">Ya terminé</button>
+      </section>
+
+      <section id="panel-cierre" class="panel" hidden>
+        <h2 id="cierre-titulo" class="titulo" tabindex="-1">¡Muy bien!</h2>
+        <p id="cierre-texto" class="intro"></p>
+        <button id="volver" class="boton" type="button">Empezar de nuevo</button>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "name": "tocador",
+  "version": "1.0.0",
+  "description": "Tutorial de maquillaje en vivo, paso a paso, para la demo de Spec-Driven Development con OpenSpec y Codex",
+  "type": "module",
+  "scripts": {
+    "start": "node scripts/servidor.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20.19.0"
+  }
+}
