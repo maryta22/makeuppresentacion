@@ -9,8 +9,9 @@ Es el proyecto de demostración de la charla **Spec-Driven Development con Codex
 Requiere Node.js 20.19 o superior. No tiene dependencias.
 
 ```bash
-npm test     # tests de la lógica
-npm start    # http://localhost:3000
+npm test               # tests de la lógica
+npm start              # http://localhost:3000
+npm run trazabilidad   # qué escenarios de la spec tienen su prueba
 ```
 
 ## Qué hay hoy
@@ -41,11 +42,26 @@ El repo ya tiene OpenSpec inicializado para Codex, en español (`openspec init -
 
 La spec viva está en `openspec/specs/tutorial/` y `openspec/specs/paso-limpieza/`.
 
+## Codex: el equipo, el guardián y el juez
+
+| Qué | Dónde | Para qué |
+|---|---|---|
+| Subagentes | `.codex/agents/implementador.toml`, `.codex/agents/revisor-spec.toml` | Un implementador por cambio de OpenSpec y un revisor que no edita |
+| Skill `$equipo` | `.agents/skills/equipo/SKILL.md` | Con una línea, reparte los cambios abiertos al equipo, en paralelo |
+| Guardián de la spec | `.codex/hooks.json`, `.codex/hooks/guardian.js` | Hooks `SubagentStop` y `Stop`: nadie termina si un escenario no tiene prueba o hay tests en rojo |
+| Trazabilidad | `scripts/trazabilidad.js` (`npm run trazabilidad`) | Cada escenario de la spec ↔ un test con el mismo nombre |
+| Auditoría | `.codex/auditoria/`, `scripts/auditar.js` (`npm run auditar`) | `codex exec --output-schema`: un JSON con cada escenario, si se cumple y la evidencia |
+| Auditoría en cada PR | `.github/workflows/auditoria-spec.yml` | La misma auditoría con `openai/codex-action`, comentada en el PR |
+| Medición | `scripts/medir-tiempos.js` (`npm run medir`) | Uno por uno, los tres a la vez o el equipo: tiempo, tokens y calidad |
+
+Codex carga `.codex/` solo si confías en el proyecto, y los hooks solo después de revisarlos con `/hooks`.
+
 ## La demo
 
-Los pasos de rubor y labial ya están propuestos en `openspec/changes/`. El guion completo, con la hidratación propuesta en vivo y tres agentes en paralelo, está en [`docs/GUION-DEMO.md`](docs/GUION-DEMO.md).
+Los pasos de rubor y labial ya están propuestos en `openspec/changes/`. El guion completo está en [`docs/GUION-DEMO.md`](docs/GUION-DEMO.md): la hidratación se propone en vivo, el equipo implementa los tres cambios, la spec cambia en vivo y Codex la audita.
 
 Ramas de respaldo:
 
 - `respaldo-propuestas`: los tres cambios propuestos (hidratación, rubor y labial).
-- `respaldo-final`: los tres pasos implementados y archivados.
+- `respaldo-equipo`: los tres implementados, con todas sus tareas marcadas, sin archivar.
+- `respaldo-final`: los tres archivados en la spec viva.

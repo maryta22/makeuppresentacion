@@ -1,0 +1,7 @@
+# Configuración de Codex para este proyecto.
+# Codex la carga cuando confías en el proyecto. Los subagentes están en .codex/agents/
+# y los hooks del guardián de la spec en .codex/hooks.json.
+
+[agents]
+# Un implementador por cambio abierto, y después un revisor por cambio.
+max_concurrent_threads_per_session = 6

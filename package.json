@@ -5,7 +5,10 @@
   "type": "module",
   "scripts": {
     "start": "node scripts/servidor.js",
-    "test": "node --test"
+    "test": "node --test",
+    "trazabilidad": "node scripts/trazabilidad.js",
+    "auditar": "node scripts/auditar.js",
+    "medir": "node scripts/medir-tiempos.js"
   },
   "engines": {
     "node": ">=20.19.0"

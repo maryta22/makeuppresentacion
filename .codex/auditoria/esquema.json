@@ -1,0 +1,75 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "cambios",
+    "resumen"
+  ],
+  "properties": {
+    "cambios": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "cambio",
+          "veredicto",
+          "escenarios"
+        ],
+        "properties": {
+          "cambio": {
+            "type": "string"
+          },
+          "veredicto": {
+            "type": "string",
+            "enum": [
+              "aprobado",
+              "cambios"
+            ]
+          },
+          "escenarios": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "capacidad",
+                "requisito",
+                "escenario",
+                "cumple",
+                "test",
+                "evidencia"
+              ],
+              "properties": {
+                "capacidad": {
+                  "type": "string"
+                },
+                "requisito": {
+                  "type": "string"
+                },
+                "escenario": {
+                  "type": "string"
+                },
+                "cumple": {
+                  "type": "boolean"
+                },
+                "test": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "evidencia": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "resumen": {
+      "type": "string"
+    }
+  }
+}

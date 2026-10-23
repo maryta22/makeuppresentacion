@@ -1,0 +1,75 @@
+# Auditoría de la spec en cada PR: Codex revisa cada escenario de los cambios
+# abiertos de OpenSpec contra los tests y el código, y comenta el resultado.
+# Usa el mismo prompt y el mismo esquema que `npm run auditar`.
+# Requiere el secreto OPENAI_API_KEY en el repositorio.
+
+name: Auditoría de la spec
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    paths: ['openspec/**', 'src/**', 'test/**']
+
+jobs:
+  auditar:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      resultado: ${{ steps.codex.outputs.final-message }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: refs/pull/${{ github.event.pull_request.number }}/merge
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Auditar con Codex
+        id: codex
+        uses: openai/codex-action@v1
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          permission-profile: ":read-only"
+          prompt-file: .codex/auditoria/prompt.md
+          output-schema-file: .codex/auditoria/esquema.json
+
+  comentar:
+    runs-on: ubuntu-latest
+    needs: auditar
+    if: needs.auditar.outputs.resultado != ''
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Comentar el resultado en el PR
+        uses: actions/github-script@v7
+        env:
+          RESULTADO: ${{ needs.auditar.outputs.resultado }}
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const { cambios, resumen } = JSON.parse(process.env.RESULTADO);
+            const partes = ['## Auditoría de la spec (Codex)', ''];
+            for (const c of cambios) {
+              const cumplen = c.escenarios.filter((e) => e.cumple).length;
+              const icono = c.veredicto === 'aprobado' ? '✅' : '❌';
+              partes.push(`### ${icono} \`${c.cambio}\` · ${cumplen}/${c.escenarios.length} escenarios`, '');
+              partes.push('| | Escenario | Test | Evidencia |', '|---|---|---|---|');
+              for (const e of c.escenarios) {
+                partes.push(`| ${e.cumple ? '✅' : '❌'} | ${e.escenario} | ${e.test ? `\`${e.test}\`` : '—'} | ${e.evidencia.replaceAll('|', '\\|')} |`);
+              }
+              partes.push('');
+            }
+            partes.push(`**Resumen:** ${resumen}`);
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body: partes.join('\n'),
+            });
+            if (cambios.some((c) => c.veredicto !== 'aprobado')) {
+              core.setFailed('La auditoría encontró escenarios que no se cumplen.');
+            }

@@ -7,6 +7,8 @@ HTML, CSS y JavaScript (módulos ES) sin frameworks ni dependencias.
 
 ## Comandos
 - Probar: `npm test` (usa `node:test`)
+- Trazabilidad spec → pruebas: `npm run trazabilidad` (o `npm run trazabilidad -- <cambio>`)
+- Auditar un cambio contra su spec con `codex exec`: `npm run auditar -- <cambio>`
 - Ejecutar: `npm start` y abrir http://localhost:3000
 - Revisar el maquillaje: http://localhost:3000/vista-previa.html aplica y difumina cada producto en cualquier tono
 
@@ -36,9 +38,14 @@ HTML, CSS y JavaScript (módulos ES) sin frameworks ni dependencias.
    - Capas: `base`, `brillo`, `bronceador`, `iluminador`, `rubor`, `cejas`, `sombra`, `pestanas`, `labios`
    - Efectos continuos (`efecto`): `espuma`, `bruma`
    - Destellos que se reproducen una vez (`alTerminar`): `enjuague`, `brillo`, `bruma`
-4. Agrega `test/<id>.test.js` con un test por escenario de la spec. `test/contrato-pasos.test.js` valida el contrato automáticamente.
+4. Agrega `test/<id>.test.js` con un test por escenario de la spec, con exactamente el nombre del escenario: `#### Scenario: Piel mixta` → `test('Piel mixta', …)`. `npm run trazabilidad` comprueba que no falte ninguno y `test/contrato-pasos.test.js` valida el contrato automáticamente.
 
 `perfil` es `{ tono, tipo }`, con los ids de `src/perfil.js`.
+
+## Equipo de agentes
+- Los subagentes del proyecto están en `.codex/agents/`: `implementador` (implementa un cambio) y `revisor_spec` (revisa un cambio contra la spec, sin editar).
+- Para implementar varios cambios abiertos a la vez, usa la skill `$equipo`: un implementador por cambio en paralelo y después un revisor por cambio.
+- El guardián de la spec (`.codex/hooks.json`) corre al terminar cada implementador y al terminar cada turno. Si un cambio con todas sus tareas marcadas tiene escenarios sin prueba, o si `npm test` falla, devuelve al agente a trabajar con el motivo.
 
 ## Reglas
 - Toda funcionalidad nueva pasa por OpenSpec: primero la propuesta en `openspec/changes/`, después el código.

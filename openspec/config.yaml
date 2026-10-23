@@ -17,8 +17,10 @@ rules:
     - Indica qué queda fuera del alcance
   specs:
     - Si el paso cambia según el tipo de piel o el tono, escribe un escenario por cada caso
+    - Los nombres de los escenarios no se repiten dentro de una capacidad
   tasks:
     - Cada tarea indica cómo se verifica (un test o algo visible en el avatar)
+    - Cada escenario se verifica con un test que lleva exactamente el nombre del escenario
     - Para un paso nuevo, crea solo src/pasos/<id>.js y su test; no edites otros pasos
     - Los pasos de maquillaje aplican su producto con avatar.difuminar dentro de aplicar; no dibujes ni animes nada nuevo
 

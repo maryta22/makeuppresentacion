@@ -1,127 +1,129 @@
 # Guion de la demo (unos 14 minutos)
 
-**Ejercicio:** construir tres pasos de la rutina (hidratación, rubor y labial) con OpenSpec y tres agentes de Codex trabajando en paralelo.
+**Ejercicio:** sumar tres pasos a la rutina (hidratación, rubor y labial) con OpenSpec y un equipo de agentes de Codex.
 
-- Rubor y labial ya están propuestos en `main` (los "preparaste antes de la charla").
-- La hidratación se explora y se propone en vivo.
-- Los tres se implementan a la vez, cada uno en su propio worktree, y se archivan uno por uno.
+Lo que se muestra de Codex, y que poca gente conoce:
 
-En los bloques de Codex, lo que empieza con `$openspec-` es un skill de OpenSpec y lo que empieza con `/` es un comando propio de Codex.
+1. **Un prompt, un equipo.** Subagentes propios versionados en el repo (`.codex/agents/`). Una skill del proyecto (`$equipo`) reparte un cambio de OpenSpec a cada implementador en paralelo y después a un revisor que no edita.
+2. **La spec como guardián.** Hooks de Codex (`.codex/hooks.json`). Ningún agente puede dar por terminado un cambio si un escenario de la spec no tiene su prueba o si hay tests en rojo: el hook lo devuelve a trabajar con el motivo.
+3. **La spec como juez.** `codex exec --output-schema` audita sin interfaz cada escenario y responde un JSON. Lo mismo corre en cada PR con `openai/codex-action`.
+
+En los bloques de Codex:
+- Lo que empieza con `$openspec-` es una skill de OpenSpec.
+- `$equipo` es la skill de este repo.
+- Lo que empieza con `/` es un comando de Codex.
 
 ## Antes de la charla
 
 - [ ] `npm test` en verde y `npm start` funcionando en http://localhost:3000.
-- [ ] `openspec --version` responde y Codex CLI tiene la sesión iniciada.
-- [ ] En Codex, revisa con `/permissions` qué puede hacer sin preguntar y con `/status` el modelo y los permisos activos.
-- [ ] Prueba `/worktree` y `/agents` en tu versión. Si `/worktree` no está, usa los worktrees de git de este guion; `/agents` necesita un servidor compartido, local o remoto.
-- [ ] Terminal con fuente grande y cuatro pestañas: una principal y tres para los agentes.
+- [ ] `openspec --version` responde y Codex tiene la sesión iniciada (`codex login`).
+- [ ] Abre Codex en el repo y confía en el proyecto: así carga `.codex/` (subagentes, hooks y configuración). Los worktrees del repo heredan esa confianza.
+- [ ] En Codex, `/hooks`: revisa y confía en los dos hooks del guardián. Codex confía por hash, así que si cambias `.codex/hooks.json` hay que volver a confiar.
+- [ ] Pregunta en Codex "¿qué subagentes tienes disponibles?" y comprueba que aparezcan `implementador` y `revisor_spec`.
+- [ ] **Mide los tiempos** desde la rama con los tres cambios propuestos:
+  - Corre `git checkout respaldo-propuestas && npm run medir`.
+  - Son 7 sesiones de Codex: 3 uno por uno, 3 en paralelo y 1 del equipo.
+  - Pasa la tabla de `resultados.md` a la diapositiva de tiempos.
+- [ ] **Guarda una auditoría:** `git checkout respaldo-equipo && npm run auditar`. Te sirve de respaldo y para la diapositiva.
+- [ ] Opcional, para mostrar la auditoría en un PR:
+  - Sube el repo y agrega el secreto `OPENAI_API_KEY` en GitHub.
+  - Abre un PR desde `respaldo-equipo`. El workflow `.github/workflows/auditoria-spec.yml` comenta el resultado.
+- [ ] Pantalla con dos paneles: Codex, grande, y una terminal con el registro del guardián:
+  `tail -f "$(git rev-parse --git-common-dir)/guardian.log"`
+- [ ] Ensaya en una copia para no ensuciar `main`, y bórrala al terminar:
+  - Crea la copia con `git worktree add --detach ../ensayo main`.
+  - Bórrala con `git worktree remove --force ../ensayo`.
 - [ ] Ensaya la demo completa al menos 3 veces y graba una corrida como respaldo.
-- [ ] Deja el repo limpio en `main` (ver "Limpiar después de ensayar").
 
-## 0. Antes: la app y sus specs (1 min)
+## 0. Antes: la app, la spec y el equipo (1 min)
 
-1. `npm start` → elige un tono y un tipo de piel → limpieza → "Ya terminé". El cierre dice que la hidratación todavía no está disponible y el recorrido muestra once pasos "próximamente".
-2. En la terminal:
+`npm start`, elige un tono, haz la limpieza y pulsa "Ya terminé". Once pasos siguen "próximamente".
 
 ```bash
-openspec list --specs   # tutorial (4 requisitos) y paso-limpieza (2)
-openspec list           # agregar-paso-labial 0/4 y agregar-paso-rubor 0/4
-ls src/pasos            # solo limpieza.js
+openspec list --specs     # tutorial y paso-limpieza
+openspec list             # agregar-paso-labial 0/4 y agregar-paso-rubor 0/4
+npm run trazabilidad      # 0/12 escenarios con prueba
+ls .codex/agents          # implementador.toml  revisor-spec.toml
 ```
 
-Qué decir: "Dos capacidades vivas, dos cambios propuestos y un solo paso en el código. Vamos a sumar tres pasos con tres agentes."
+Qué decir: "La spec, el equipo y sus reglas viven en el repo. Quien clona el repo, clona también el equipo."
 
-## 1. Explorar la hidratación (2 min)
+## 1. Proponer la hidratación (2 min)
 
-En Codex, en el repo principal. Primero adjunta la spec viva como contexto y luego explora:
-
-```
-/mention openspec/specs/
-$openspec-explore Quiero el paso de hidratación: si la piel está muy seca, sérum; si no, crema humectante. ¿Qué decisiones faltan?
-```
-
-Qué remarcar: aparecen preguntas que un prompt suelto no hace. ¿Qué pasa con la piel grasa? ¿Y la mixta? ¿Cómo se ve en el avatar? ¿Cuánto esperar antes del primer?
-
-Decide en voz alta:
-- Seca: sérum sobre la piel aún húmeda y luego crema nutritiva.
-- Grasa: gel o crema ligera sin aceites.
-- Mixta: crema ligera, un poco más en las mejillas.
-- Normal: crema humectante ligera.
-- Avatar: un brillo de piel hidratada, más intenso en piel seca y más sutil en piel grasa.
-
-## 2. Proponer (2 min)
+En Codex:
 
 ```
 $openspec-propose agregar-paso-hidratacion: seca, sérum y luego crema nutritiva; grasa, gel o crema ligera sin aceites; mixta, crema ligera y un poco más en las mejillas; normal, crema humectante ligera. En el avatar, brillo de piel hidratada más intenso en piel seca y más sutil en piel grasa.
-```
-
-Revisa en Codex lo que creó (es tu punto de control):
-
-```
 /diff
 ```
 
-Luego, en la terminal, valida y guarda la propuesta:
+En la terminal:
 
 ```bash
-openspec validate agregar-paso-hidratacion
+openspec validate agregar-paso-hidratacion --strict
 git add -A && git commit -m "Proponer el paso de hidratación"
 ```
 
-## 3. Durante: tres agentes en paralelo (5 min)
+Si sobra tiempo, antes de proponer explora con `$openspec-explore` para mostrar las preguntas que hace: piel mixta, qué se ve en el avatar, cuánto esperar antes del primer.
 
-Cada agente trabaja en su propia copia del repo (un worktree). La forma nativa es `/worktree` dentro de Codex, que abre la conversación en un worktree gestionado. Si tu versión no lo tiene, créalos a mano:
+## 2. Un prompt, un equipo (5 min)
+
+En Codex, una sola línea:
+
+```
+$equipo
+```
+
+Qué pasa, para narrarlo:
+
+1. Codex corre `openspec list --json` y encuentra los tres cambios con tareas pendientes.
+2. Lanza tres `implementador` en paralelo, uno por cambio. Puedes abrir el hilo de cada subagente desde la actividad del hilo principal.
+3. Cuando un implementador intenta terminar, corre el hook `SubagentStop`. Si le faltan tareas, pruebas por escenario o tiene tests en rojo, el registro muestra `✗ implementador (…): lo devuelvo a trabajar`.
+4. Después lanza tres `revisor_spec` en paralelo. Cada uno revisa su cambio escenario por escenario, sin editar.
+5. Cierra con una tabla y "Listos para archivar: …". No archiva: eso lo decides tú.
+
+Mientras tanto, en la terminal:
 
 ```bash
-git worktree add ../demo-hidratacion -b paso-hidratacion
-git worktree add ../demo-rubor -b paso-rubor
-git worktree add ../demo-labial -b paso-labial
+npm run trazabilidad      # los escenarios pasan de ✗ a ✓
 ```
 
-En cada pestaña, abre Codex en su copia (`/worktree`, o `cd ../demo-rubor && codex`) y escribe:
+Qué decir:
+- "No abrí tres terminales: definí un equipo."
+- "Cada implementador toca solo su paso. Pueden trabajar a la vez porque cada cambio de OpenSpec es un archivo y una capacidad."
+- "Nadie se califica a sí mismo: el revisor no edita y el guardián no le cree a nadie que diga 'listo'."
+
+## 3. La spec manda (2 min)
+
+Abre `openspec/changes/agregar-paso-rubor/specs/paso-rubor/spec.md`. Pega el escenario de [`escenario-en-vivo.md`](escenario-en-vivo.md) al final y guarda.
+
+En Codex escribe algo que no pida nada:
 
 ```
-$openspec-apply-change agregar-paso-rubor
-/goal Completa todas las tareas de openspec/changes/agregar-paso-rubor/tasks.md y deja npm test en verde
+Gracias, eso es todo.
 ```
 
-`/goal` mantiene al agente trabajando hasta cumplir el objetivo. Repite en las otras dos pestañas con `agregar-paso-hidratacion` y `agregar-paso-labial`. Si `/agents` funciona en tu versión, úsalo para mostrar los tres agentes desde un solo lugar.
+Codex responde e intenta terminar. El hook `Stop` encuentra el escenario sin prueba y lo devuelve a trabajar. Codex escribe el test y ajusta el rubor sin que se lo pidas. En el registro aparece `✗` y luego `✓`.
 
-Mientras trabajan, desde la pestaña principal muestra el "durante":
+Muéstralo en http://localhost:3000/vista-previa.html con tono profundo y rubor.
+
+Qué decir: "No le pedí nada a Codex. Cambié la spec, y la spec lo puso a trabajar."
+
+## 4. La spec como juez (2 min)
 
 ```bash
-openspec list   # el avance de tasks.md de cada cambio, en el repo principal sigue en 0
-cat ../demo-rubor/openspec/changes/agregar-paso-rubor/tasks.md   # las casillas se van marcando
+npm run auditar -- agregar-paso-rubor
 ```
 
-Qué decir: "Ninguno toca los archivos de los otros: cada paso es un archivo y una capacidad propia. Por eso pueden trabajar a la vez."
+Es `codex exec --output-schema` sin interfaz. Codex revisa cada escenario y responde un JSON que sigue `.codex/auditoria/esquema.json`. El script lo muestra como tabla: escenario, si se cumple y la evidencia con archivo y línea.
 
-Cuando cada agente termine, pídele que revise su propio trabajo:
+Si preparaste el PR, muéstralo: el mismo prompt y el mismo esquema corren con `openai/codex-action` y dejan la tabla como comentario.
 
-```
-/review
-```
+Qué decir: "La misma spec que guió a los agentes ahora es el criterio de aceptación en CI."
 
-`/review` busca cambios de comportamiento y tests que faltan. Luego, en la terminal de esa copia:
+## 5. Después: archivar y ver (2 min)
 
-```bash
-npm test && git add -A && git commit -m "Implementar el paso"
-```
-
-Si usaste `/worktree`, integra la rama que Codex creó para cada copia en lugar de `paso-…` en el paso 4.
-
-## 4. Después: integrar, ver y archivar (3 min)
-
-En la pestaña principal:
-
-```bash
-git merge paso-hidratacion paso-rubor paso-labial
-npm start
-```
-
-En el navegador: limpieza → hidratación → rubor (la brocha difumina en el color del tono elegido) → labial. Prueba con un tono claro y uno profundo para mostrar que cambian los colores.
-
-Archiva uno por uno desde Codex y muestra cómo crece la spec viva:
+En Codex:
 
 ```
 $openspec-archive-change agregar-paso-hidratacion
@@ -129,33 +131,44 @@ $openspec-archive-change agregar-paso-rubor
 $openspec-archive-change agregar-paso-labial
 ```
 
-En la terminal:
+Si el tiempo apremia, archiva desde la terminal con `openspec archive <cambio> -y`.
 
 ```bash
 openspec list --specs          # 5 capacidades
 ls openspec/changes/archive    # el historial con fecha
+npm start
 ```
 
-Si el tiempo apremia, el mismo archivo se hace en la terminal con `openspec archive <cambio> -y`. Para el siguiente cambio, empieza con `/new` en Codex: contexto limpio.
+En el navegador: limpieza → hidratación → rubor → labial, con un tono claro y uno profundo para que cambien los colores. Cierra con la diapositiva de tiempos.
 
-Si el repo está conectado a Codex en GitHub, abre un pull request y comenta `@codex revisa este PR contra openspec/specs/` para cerrar con la revisión en la nube.
-
-Qué decir: "Lo que acordamos antes de escribir código es exactamente lo que quedó documentado después."
+Qué decir: "Lo que acordamos antes de escribir código es exactamente lo que quedó documentado, probado y auditado después."
 
 ## Plan B
 
 Si algo falla o el modelo tarda demasiado:
 
-- `git checkout respaldo-propuestas`: los tres cambios ya propuestos; continúa en el paso 3.
-- `git checkout respaldo-final`: los tres pasos implementados y archivados; muestra el paso 4 desde `npm start`.
+| Rama | Qué tiene | Sigue en |
+|---|---|---|
+| `respaldo-propuestas` | Los tres cambios propuestos | Momento 2 |
+| `respaldo-equipo` | Los tres implementados, con tareas marcadas y sin archivar | Momentos 3 y 4 |
+| `respaldo-final` | Los tres archivados | Momento 5 |
 
-## Limpiar después de ensayar
+## Medir los tiempos
 
 ```bash
-git checkout main
-git worktree remove ../demo-hidratacion --force
-git worktree remove ../demo-rubor --force
-git worktree remove ../demo-labial --force
-git branch -D paso-hidratacion paso-rubor paso-labial
-git reset --hard origin/main   # solo si subiste main a GitHub
+git checkout respaldo-propuestas
+npm run medir                           # las tres formas
+npm run medir -- --modos=paralelo       # solo una
 ```
+
+Cada forma corre en copias limpias del repo, en `../tocador-medicion-<fecha>/`. Al final imprime la tabla y la guarda en `resultados.md` y `resultados.json`. Cada fila trae:
+- El tiempo.
+- Los tokens que reporta `codex exec --json`.
+- Si `npm test` quedó en verde.
+- Cuántos escenarios quedaron con prueba.
+
+En el modo equipo, revisa en tu panel de uso si los tokens de los subagentes se suman a los del hilo principal.
+
+Para borrar las copias al terminar:
+- Lístalas con `git worktree list`.
+- Borra cada una con `git worktree remove --force <ruta>`.

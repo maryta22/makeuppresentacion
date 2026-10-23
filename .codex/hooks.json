@@ -1,0 +1,29 @@
+{
+  "hooks": {
+    "SubagentStop": [
+      {
+        "matcher": "^implementador$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/guardian.js\"",
+            "timeout": 120,
+            "statusMessage": "Guardián de la spec: revisando el cambio del implementador"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/guardian.js\"",
+            "timeout": 120,
+            "statusMessage": "Guardián de la spec: escenarios, pruebas y validación"
+          }
+        ]
+      }
+    ]
+  }
+}
