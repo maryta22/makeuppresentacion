@@ -42,13 +42,13 @@ El repo ya tiene OpenSpec inicializado para Codex, en español (`openspec init -
 
 La spec viva está en `openspec/specs/tutorial/` y `openspec/specs/paso-limpieza/`.
 
-## Codex: el equipo, el guardián y el juez
+## Codex: el equipo, el spec gate y la auditoría
 
 | Qué | Dónde | Para qué |
 |---|---|---|
 | Subagentes | `.codex/agents/implementador.toml`, `.codex/agents/revisor-spec.toml` | Un implementador por cambio de OpenSpec y un revisor que no edita |
 | Skill `$equipo` | `.agents/skills/equipo/SKILL.md` | Con una línea, reparte los cambios abiertos al equipo, en paralelo |
-| Guardián de la spec | `.codex/hooks.json`, `.codex/hooks/guardian.js` | Hooks `SubagentStop` y `Stop`: nadie termina si un escenario no tiene prueba o hay tests en rojo |
+| Spec gate | `.codex/hooks.json`, `.codex/hooks/spec-gate.js` | Hooks `SubagentStop` y `Stop`: nadie termina si un escenario no tiene prueba o hay tests en rojo |
 | Trazabilidad | `scripts/trazabilidad.js` (`npm run trazabilidad`) | Cada escenario de la spec ↔ un test con el mismo nombre |
 | Auditoría | `.codex/auditoria/`, `scripts/auditar.js` (`npm run auditar`) | `codex exec --output-schema`: un JSON con cada escenario, si se cumple y la evidencia |
 | Auditoría en cada PR | `.github/workflows/auditoria-spec.yml` | La misma auditoría con `openai/codex-action`, comentada en el PR |

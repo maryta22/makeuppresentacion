@@ -1,4 +1,4 @@
-// Guardián de la spec: hook de Codex (ver .codex/hooks.json).
+// Spec gate: hook de Codex (ver .codex/hooks.json).
 //
 // - SubagentStop (implementador): antes de que un implementador termine, revisa
 //   SU cambio: tareas marcadas, un test por escenario y sus tests en verde.
@@ -9,8 +9,8 @@
 // sigue trabajando con ese motivo como instrucción. Después de 3 intentos
 // seguidos lo deja terminar para no quedar en un ciclo.
 //
-// Cada decisión queda en .git/guardian.log (fuera del repo versionado):
-//   tail -f "$(git rev-parse --git-common-dir)/guardian.log"
+// Cada decisión queda en .git/spec-gate.log (fuera del repo versionado):
+//   tail -f "$(git rev-parse --git-common-dir)/spec-gate.log"
 
 import { spawnSync } from 'node:child_process';
 import { appendFileSync, existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -69,7 +69,7 @@ export function revisarTurno(raiz) {
 
 export function revisarImplementador(raiz, mensaje = '') {
   const cambio = [...mensaje.matchAll(/^\s*Cambio:\s*([a-z0-9][a-z0-9-]*)\s*$/gim)].pop()?.[1];
-  if (!cambio) return { cambio: null, lista: ['Termina tu respuesta con la línea "Cambio: <id-del-cambio>" para que el guardián revise tu cambio.'] };
+  if (!cambio) return { cambio: null, lista: ['Termina tu respuesta con la línea "Cambio: <id-del-cambio>" para que el spec gate revise tu cambio.'] };
   const resultado = revisarTrazabilidad(raiz, { cambio });
   const lista = problemas(resultado, { exigirTareas: true });
   for (const paso of pasosDelCambio(resultado)) {
@@ -82,7 +82,7 @@ export function revisarImplementador(raiz, mensaje = '') {
 }
 
 function contarIntento(clave, fallo) {
-  const ruta = join(tmpdir(), `tocador-guardian-${clave.replace(/[^a-zA-Z0-9-]/g, '_')}.json`);
+  const ruta = join(tmpdir(), `tocador-spec-gate-${clave.replace(/[^a-zA-Z0-9-]/g, '_')}.json`);
   if (!fallo) {
     rmSync(ruta, { force: true });
     return 0;
@@ -98,7 +98,7 @@ function registrar(raiz, linea) {
   const dirGit = git(['rev-parse', '--git-common-dir'], raiz);
   if (!dirGit) return;
   const hora = new Date().toLocaleTimeString('es', { hour12: false });
-  try { appendFileSync(resolve(raiz, dirGit, 'guardian.log'), `${hora}  ${linea}\n`); } catch {}
+  try { appendFileSync(resolve(raiz, dirGit, 'spec-gate.log'), `${hora}  ${linea}\n`); } catch {}
 }
 
 const detalle = (lista) => lista.map((p) => `\n            · ${p}`).join('');
@@ -136,7 +136,7 @@ function main() {
   }
   registrar(raiz, `✗ ${quien}: lo devuelvo a trabajar (intento ${intentos} de ${MAX_INTENTOS})${detalle(lista)}`);
   const reason = [
-    'Guardián de la spec: todavía no puedes terminar.',
+    'Spec gate: todavía no puedes terminar.',
     ...lista.map((p) => `- ${p}`),
     'Corrígelo (código y un test con el nombre exacto de cada escenario) y vuelve a verificar.'
   ].join('\n');

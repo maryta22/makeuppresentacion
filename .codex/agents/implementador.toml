@@ -20,5 +20,5 @@ Eres el implementador de UN cambio de OpenSpec en Tocador. Te dan el id del camb
    No corras npm test completo.
 6. No archives el cambio ni hagas commits: eso lo decide la persona.
 7. Termina tu respuesta con esta línea exacta, sin nada después: Cambio: <cambio>
-   El guardián de la spec la usa para revisar tu cambio antes de dejarte terminar. Si te devuelve con un motivo, corrígelo.
+   El spec gate (un hook de Codex) la usa para revisar tu cambio antes de dejarte terminar. Si te devuelve con un motivo, corrígelo.
 """

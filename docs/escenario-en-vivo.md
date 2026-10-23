@@ -1,6 +1,6 @@
 # Escenario para agregar en vivo
 
-Momento 3 del guion: con el rubor ya implementado (todas sus tareas marcadas), agrega este escenario a la spec del cambio y deja que el guardián ponga a Codex a trabajar.
+Momento 3 del guion: con el rubor ya implementado (todas sus tareas marcadas), agrega este escenario a la spec del cambio y deja que el spec gate ponga a Codex a trabajar.
 
 Archivo: `openspec/changes/agregar-paso-rubor/specs/paso-rubor/spec.md`
 
@@ -17,8 +17,8 @@ Después escribe en Codex algo que no pida nada, por ejemplo `Gracias, eso es to
 Qué pasa:
 
 1. Codex responde y va a terminar el turno.
-2. El hook `Stop` corre el guardián: el cambio dice estar listo, pero el escenario nuevo no tiene un test con su nombre.
-3. El guardián responde `decision: block` con el motivo, y Codex sigue trabajando solo: escribe `test('Rubor más pigmentado en piel oscura', …)` y ajusta `src/pasos/rubor.js`.
+2. El hook `Stop` corre el spec gate: el cambio dice estar listo, pero el escenario nuevo no tiene un test con su nombre.
+3. El spec gate responde `decision: block` con el motivo, y Codex sigue trabajando solo: escribe `test('Rubor más pigmentado en piel oscura', …)` y ajusta `src/pasos/rubor.js`.
 4. En el panel del registro aparece primero `✗ turno: lo devuelvo a trabajar` y luego `✓ turno: todo cumple la spec`.
 
 Para verlo en el avatar: http://localhost:3000/vista-previa.html, tono profundo, rubor.

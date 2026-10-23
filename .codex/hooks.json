@@ -6,9 +6,9 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/guardian.js\"",
+            "command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/spec-gate.js\"",
             "timeout": 120,
-            "statusMessage": "Guardián de la spec: revisando el cambio del implementador"
+            "statusMessage": "Spec gate: revisando el cambio del implementador"
           }
         ]
       }
@@ -18,9 +18,9 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/guardian.js\"",
+            "command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/spec-gate.js\"",
             "timeout": 120,
-            "statusMessage": "Guardián de la spec: escenarios, pruebas y validación"
+            "statusMessage": "Spec gate: escenarios, pruebas y validación"
           }
         ]
       }

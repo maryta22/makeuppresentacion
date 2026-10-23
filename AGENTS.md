@@ -45,7 +45,7 @@ HTML, CSS y JavaScript (módulos ES) sin frameworks ni dependencias.
 ## Equipo de agentes
 - Los subagentes del proyecto están en `.codex/agents/`: `implementador` (implementa un cambio) y `revisor_spec` (revisa un cambio contra la spec, sin editar).
 - Para implementar varios cambios abiertos a la vez, usa la skill `$equipo`: un implementador por cambio en paralelo y después un revisor por cambio.
-- El guardián de la spec (`.codex/hooks.json`) corre al terminar cada implementador y al terminar cada turno. Si un cambio con todas sus tareas marcadas tiene escenarios sin prueba, o si `npm test` falla, devuelve al agente a trabajar con el motivo.
+- El spec gate (`.codex/hooks.json`, `.codex/hooks/spec-gate.js`) corre al terminar cada implementador y al terminar cada turno. Si un cambio con todas sus tareas marcadas tiene escenarios sin prueba, o si `npm test` falla, devuelve al agente a trabajar con el motivo.
 
 ## Reglas
 - Toda funcionalidad nueva pasa por OpenSpec: primero la propuesta en `openspec/changes/`, después el código.

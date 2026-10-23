@@ -5,8 +5,8 @@
 Lo que se muestra de Codex, y que poca gente conoce:
 
 1. **Un prompt, un equipo.** Subagentes propios versionados en el repo (`.codex/agents/`). Una skill del proyecto (`$equipo`) reparte un cambio de OpenSpec a cada implementador en paralelo y después a un revisor que no edita.
-2. **La spec como guardián.** Hooks de Codex (`.codex/hooks.json`). Ningún agente puede dar por terminado un cambio si un escenario de la spec no tiene su prueba o si hay tests en rojo: el hook lo devuelve a trabajar con el motivo.
-3. **La spec como juez.** `codex exec --output-schema` audita sin interfaz cada escenario y responde un JSON. Lo mismo corre en cada PR con `openai/codex-action`.
+2. **Spec gate.** Hooks de Codex (`.codex/hooks.json`). Ningún agente puede dar por terminado un cambio si un escenario de la spec no tiene su prueba o si hay tests en rojo: el hook lo devuelve a trabajar con el motivo.
+3. **Auditoría.** `codex exec --output-schema` audita sin interfaz cada escenario y responde un JSON. Lo mismo corre en cada PR con `openai/codex-action`.
 
 En los bloques de Codex:
 - Lo que empieza con `$openspec-` es una skill de OpenSpec.
@@ -18,7 +18,7 @@ En los bloques de Codex:
 - [ ] `npm test` en verde y `npm start` funcionando en http://localhost:3000.
 - [ ] `openspec --version` responde y Codex tiene la sesión iniciada (`codex login`).
 - [ ] Abre Codex en el repo y confía en el proyecto: así carga `.codex/` (subagentes, hooks y configuración). Los worktrees del repo heredan esa confianza.
-- [ ] En Codex, `/hooks`: revisa y confía en los dos hooks del guardián. Codex confía por hash, así que si cambias `.codex/hooks.json` hay que volver a confiar.
+- [ ] En Codex, `/hooks`: revisa y confía en los dos hooks del spec gate. Codex confía por hash, así que si cambias `.codex/hooks.json` hay que volver a confiar.
 - [ ] Pregunta en Codex "¿qué subagentes tienes disponibles?" y comprueba que aparezcan `implementador` y `revisor_spec`.
 - [ ] **Mide los tiempos** desde la rama con los tres cambios propuestos:
   - Corre `git checkout respaldo-propuestas && npm run medir`.
@@ -28,8 +28,8 @@ En los bloques de Codex:
 - [ ] Opcional, para mostrar la auditoría en un PR:
   - Sube el repo y agrega el secreto `OPENAI_API_KEY` en GitHub.
   - Abre un PR desde `respaldo-equipo`. El workflow `.github/workflows/auditoria-spec.yml` comenta el resultado.
-- [ ] Pantalla con dos paneles: Codex, grande, y una terminal con el registro del guardián:
-  `tail -f "$(git rev-parse --git-common-dir)/guardian.log"`
+- [ ] Pantalla con dos paneles: Codex, grande, y una terminal con el registro del spec gate:
+  `tail -f "$(git rev-parse --git-common-dir)/spec-gate.log"`
 - [ ] Ensaya en una copia para no ensuciar `main`, y bórrala al terminar:
   - Crea la copia con `git worktree add --detach ../ensayo main`.
   - Bórrala con `git worktree remove --force ../ensayo`.
@@ -91,7 +91,7 @@ npm run trazabilidad      # los escenarios pasan de ✗ a ✓
 Qué decir:
 - "No abrí tres terminales: definí un equipo."
 - "Cada implementador toca solo su paso. Pueden trabajar a la vez porque cada cambio de OpenSpec es un archivo y una capacidad."
-- "Nadie se califica a sí mismo: el revisor no edita y el guardián no le cree a nadie que diga 'listo'."
+- "Nadie se califica a sí mismo: el revisor no edita y el spec gate no le cree a nadie que diga 'listo'."
 
 ## 3. La spec manda (2 min)
 
@@ -109,7 +109,7 @@ Muéstralo en http://localhost:3000/vista-previa.html con tono profundo y rubor.
 
 Qué decir: "No le pedí nada a Codex. Cambié la spec, y la spec lo puso a trabajar."
 
-## 4. La spec como juez (2 min)
+## 4. Auditoría (2 min)
 
 ```bash
 npm run auditar -- agregar-paso-rubor
