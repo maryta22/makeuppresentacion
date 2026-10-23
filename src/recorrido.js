@@ -7,10 +7,14 @@ export const RECORRIDO = [
   { id: 'hidratacion', titulo: 'Hidratación' },
   { id: 'primer', titulo: 'Primer' },
   { id: 'base', titulo: 'Base' },
+  { id: 'bronceador', titulo: 'Bronceador' },
+  { id: 'iluminador', titulo: 'Iluminador' },
   { id: 'rubor', titulo: 'Rubor' },
   { id: 'cejas', titulo: 'Cejas' },
+  { id: 'sombra-ojos', titulo: 'Sombra de ojos' },
   { id: 'pestanas', titulo: 'Pestañas' },
-  { id: 'labial', titulo: 'Labial' }
+  { id: 'labial', titulo: 'Labial' },
+  { id: 'sellador', titulo: 'Sellador' }
 ];
 
 const importarPaso = (id) => import(`./pasos/${id}.js`);

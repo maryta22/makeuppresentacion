@@ -26,8 +26,9 @@ HTML, CSS y JavaScript (módulos ES) sin frameworks ni dependencias.
    - `recomendacion(perfil)`: `{ titulo, texto }`, adaptada al tipo de piel o al tono
    - Opcionales: `efecto` (efecto continuo del avatar), `alTerminar` (destello al terminar), `aplicar(avatar, perfil)` (maquillaje que queda puesto), `logro` (frase al cerrar)
 3. Para maquillar al avatar usa su API, sin editar el SVG:
-   - `avatar.capa(nombre, { color, opacidad, grosor })` con las capas `base`, `brillo`, `rubor`, `cejas`, `pestanas`, `labios`
-   - Efectos existentes: `espuma` (continuo), `enjuague` y `brillo` (destellos)
+   - `avatar.capa(nombre, { color, opacidad, grosor })` con las capas `base`, `brillo`, `bronceador`, `iluminador`, `rubor`, `cejas`, `sombra`, `pestanas`, `labios`
+   - Efectos continuos (`efecto`): `espuma`, `bruma`
+   - Destellos que se reproducen una vez (`alTerminar`): `enjuague`, `brillo`, `bruma`
 4. Agrega `test/<id>.test.js` con un test por escenario de la spec. `test/contrato-pasos.test.js` valida el contrato automáticamente.
 
 `perfil` es `{ tono, tipo }`, con los ids de `src/perfil.js`.

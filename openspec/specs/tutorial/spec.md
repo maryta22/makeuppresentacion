@@ -4,6 +4,7 @@
 Guiar a la persona por una rutina de maquillaje paso a paso, con un avatar en un espejo que habla y muestra cada paso, adaptando los consejos a su tono de rostro y tipo de piel.
 
 ## Requirements
+
 ### Requirement: Elegir el perfil
 El sistema SHALL pedir el tono del rostro (6 opciones) y el tipo de piel (seca, grasa, mixta o normal) antes de comenzar, y SHALL mostrar en el avatar el tono elegido en cuanto se selecciona.
 
@@ -20,7 +21,11 @@ El sistema SHALL pedir el tono del rostro (6 opciones) y el tipo de piel (seca, 
 - **THEN** se muestra el primer paso disponible del recorrido
 
 ### Requirement: Recorrer los pasos
-El sistema SHALL mostrar el recorrido completo en orden (limpieza, hidratación, primer, base, rubor, cejas, pestañas, labial), marcando el paso actual, los pasos hechos y los que todavía no están disponibles; al pulsar "Ya terminé" SHALL llevar al siguiente paso disponible, saltando los que no existen.
+El sistema SHALL mostrar el recorrido completo en orden (limpieza, hidratación, primer, base, bronceador, iluminador, rubor, cejas, sombra de ojos, pestañas, labial y sellador), marcando el paso actual, los pasos hechos y los que todavía no están disponibles; al pulsar "Ya terminé" SHALL llevar al siguiente paso disponible, saltando los que no existen.
+
+#### Scenario: Orden de la rutina
+- **WHEN** se muestra el recorrido
+- **THEN** aparecen los 12 pasos en el orden indicado, del primero al último
 
 #### Scenario: Pasos todavía no disponibles
 - **WHEN** un paso del recorrido aún no existe en la aplicación

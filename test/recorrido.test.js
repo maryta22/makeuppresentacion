@@ -4,10 +4,13 @@ import { RECORRIDO, cargarPasos, primerPaso, siguientePaso } from '../src/recorr
 
 const con = (...ids) => new Map(ids.map((id) => [id, { id }]));
 
-test('el recorrido completo tiene ocho pasos en orden', () => {
+test('el recorrido completo tiene doce pasos en orden', () => {
   assert.deepEqual(
     RECORRIDO.map((paso) => paso.id),
-    ['limpieza', 'hidratacion', 'primer', 'base', 'rubor', 'cejas', 'pestanas', 'labial']
+    [
+      'limpieza', 'hidratacion', 'primer', 'base', 'bronceador', 'iluminador',
+      'rubor', 'cejas', 'sombra-ojos', 'pestanas', 'labial', 'sellador'
+    ]
   );
 });
 
@@ -35,5 +38,5 @@ test('si no quedan pasos disponibles, indica cuál es el siguiente pendiente', (
 });
 
 test('después del último paso, el recorrido termina', () => {
-  assert.deepEqual(siguientePaso('labial', con('labial')), { tipo: 'fin' });
+  assert.deepEqual(siguientePaso('sellador', con('sellador')), { tipo: 'fin' });
 });

@@ -323,6 +323,7 @@ body {
 
 .recorrido ol {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   margin: 0;
   padding: 0 0 4px;
@@ -468,6 +469,18 @@ body {
 .avatar .capa-rubor { opacity: var(--capa-rubor-opacidad, 0); transition: opacity 0.8s ease; }
 .avatar .capa-rubor ellipse { fill: var(--capa-rubor-color, #E36F7E); }
 
+.avatar .capa-bronceador { opacity: var(--capa-bronceador-opacidad, 0); transition: opacity 0.8s ease; }
+.avatar .capa-bronceador ellipse {
+  fill: var(--capa-bronceador-color, color-mix(in srgb, var(--piel) 55%, #5A2E1A));
+  transition: fill 0.8s ease;
+}
+
+.avatar .capa-iluminador { opacity: var(--capa-iluminador-opacidad, 0); transition: opacity 0.8s ease; }
+.avatar .capa-iluminador ellipse { fill: var(--capa-iluminador-color, #FFF3DC); transition: fill 0.8s ease; }
+
+.avatar .capa-sombra { opacity: var(--capa-sombra-opacidad, 0); transition: opacity 0.8s ease; }
+.avatar .capa-sombra path { fill: var(--capa-sombra-color, #9B6B8E); transition: fill 0.8s ease; }
+
 .avatar .cejas path {
   fill: none;
   stroke: var(--capa-cejas-color, var(--ceja-natural));
@@ -556,6 +569,22 @@ body {
   to { translate: 0 60px; opacity: 0; }
 }
 
+/* Bruma del sellador: gotitas que se esparcen sobre el rostro */
+.avatar .bruma { opacity: 0; transition: opacity 0.4s ease; }
+.avatar .gotita { fill: #fff; fill-opacity: 0.85; transform-box: fill-box; transform-origin: center; }
+.avatar.efecto-bruma .bruma,
+.avatar.destello-bruma .bruma { opacity: 1; }
+.avatar.efecto-bruma .gotita { animation: esparcir 1.8s ease-out infinite; }
+.avatar.destello-bruma .gotita { animation: esparcir 1.6s ease-out both; }
+.avatar .gotita:nth-child(3n) { animation-delay: 0.3s; }
+.avatar .gotita:nth-child(3n + 1) { animation-delay: 0.6s; }
+
+@keyframes esparcir {
+  from { transform: scale(0.2); opacity: 0; }
+  30% { opacity: 1; }
+  to { transform: scale(1.6) translate(0, 4px); opacity: 0; }
+}
+
 /* Brillo final: destellos */
 .avatar .destellos { opacity: 0; }
 .avatar .destello { fill: #fff; transform-box: fill-box; transform-origin: center; }
@@ -579,6 +608,7 @@ body {
   .bombilla { width: 14px; height: 14px; }
   .titulo { font-size: 42px; }
   .tonos { gap: 10px; }
+  .recorrido ol { flex-wrap: nowrap; }
   .tono__muestra { width: 46px; height: 46px; }
   .intro { font-size: 18px; }
   body[data-pantalla='inicio'] .globo { display: none; }

@@ -5,8 +5,9 @@
 //   avatar.capa('labios', { color: '#B3314A' })    maquillaje que se queda puesto
 //   avatar.hablar(true | false)                    mueve la boca mientras habla
 //
-// Capas disponibles para los pasos: base, brillo, rubor, cejas, pestanas, labios.
-// Efectos continuos: espuma. Destellos: enjuague, brillo.
+// Capas disponibles para los pasos:
+//   base, brillo, bronceador, iluminador, rubor, cejas, sombra, pestanas, labios.
+// Efectos continuos: espuma, bruma. Destellos (una vez): enjuague, brillo, bruma.
 
 const SVG = `
 <svg class="avatar" viewBox="0 0 320 400" role="img" aria-label="Avatar que muestra cada paso del tutorial">
@@ -14,6 +15,12 @@ const SVG = `
     <filter id="suavizado" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="5" />
     </filter>
+    <filter id="suavizado-fino" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2.5" />
+    </filter>
+    <clipPath id="recorte-rostro">
+      <path d="M160 58 C216 58 252 98 252 162 C252 222 216 272 160 280 C104 272 68 222 68 162 C68 98 104 58 160 58 Z" />
+    </clipPath>
     <radialGradient id="brillo-piel" cx="50%" cy="40%" r="50%">
       <stop offset="0%" stop-color="#fff" stop-opacity="0.75" />
       <stop offset="100%" stop-color="#fff" stop-opacity="0" />
@@ -37,9 +44,32 @@ const SVG = `
     <ellipse cx="160" cy="182" rx="6" ry="16" fill="url(#brillo-piel)" />
   </g>
 
-  <g class="capa-rubor" filter="url(#suavizado)">
+  <g class="capa-bronceador" filter="url(#suavizado)" clip-path="url(#recorte-rostro)">
+    <ellipse cx="96" cy="218" rx="20" ry="7" transform="rotate(-24 96 218)" />
+    <ellipse cx="224" cy="218" rx="20" ry="7" transform="rotate(24 224 218)" />
+    <ellipse cx="80" cy="128" rx="9" ry="22" />
+    <ellipse cx="240" cy="128" rx="9" ry="22" />
+    <ellipse cx="124" cy="262" rx="22" ry="6" transform="rotate(28 124 262)" />
+    <ellipse cx="196" cy="262" rx="22" ry="6" transform="rotate(-28 196 262)" />
+  </g>
+
+  <g class="capa-rubor" filter="url(#suavizado)" clip-path="url(#recorte-rostro)">
     <ellipse cx="108" cy="204" rx="22" ry="13" />
     <ellipse cx="212" cy="204" rx="22" ry="13" />
+  </g>
+
+  <g class="capa-iluminador" filter="url(#suavizado-fino)" clip-path="url(#recorte-rostro)">
+    <ellipse cx="116" cy="184" rx="15" ry="5" transform="rotate(-12 116 184)" />
+    <ellipse cx="204" cy="184" rx="15" ry="5" transform="rotate(12 204 184)" />
+    <ellipse cx="160" cy="176" rx="3" ry="13" />
+    <ellipse cx="160" cy="222" rx="7" ry="2.5" />
+    <ellipse cx="122" cy="140" rx="12" ry="3" />
+    <ellipse cx="198" cy="140" rx="12" ry="3" />
+  </g>
+
+  <g class="capa-sombra" filter="url(#suavizado-fino)">
+    <path d="M98 157 C104 136 136 134 146 156 C134 146 110 146 98 157 Z" />
+    <path d="M222 157 C216 136 184 134 174 156 C186 146 210 146 222 157 Z" />
   </g>
 
   <g class="cejas">
@@ -103,6 +133,21 @@ const SVG = `
     <path class="gota" transform="translate(160 274)" d="M0 0 C3 5 6 9 6 12 A6 6 0 0 1 -6 12 C-6 9 -3 5 0 0 Z" />
   </g>
 
+  <g class="bruma">
+    <circle class="gotita" cx="104" cy="120" r="3" />
+    <circle class="gotita" cx="132" cy="96" r="2.5" />
+    <circle class="gotita" cx="190" cy="98" r="3" />
+    <circle class="gotita" cx="218" cy="124" r="2.5" />
+    <circle class="gotita" cx="92" cy="176" r="2.5" />
+    <circle class="gotita" cx="230" cy="172" r="3" />
+    <circle class="gotita" cx="112" cy="236" r="3" />
+    <circle class="gotita" cx="208" cy="238" r="2.5" />
+    <circle class="gotita" cx="146" cy="150" r="2" />
+    <circle class="gotita" cx="176" cy="200" r="2" />
+    <circle class="gotita" cx="160" cy="250" r="2.5" />
+    <circle class="gotita" cx="160" cy="130" r="2" />
+  </g>
+
   <g class="destellos">
     <path class="destello" transform="translate(236 112)" d="M0 -12 L3 -3 L12 0 L3 3 L0 12 L-3 3 L-12 0 L-3 -3 Z" />
     <path class="destello" transform="translate(84 236)" d="M0 -9 L2 -2 L9 0 L2 2 L0 9 L-2 2 L-9 0 L-2 -2 Z" />
@@ -110,7 +155,7 @@ const SVG = `
   </g>
 </svg>`;
 
-const CAPAS = ['base', 'brillo', 'rubor', 'cejas', 'pestanas', 'labios'];
+const CAPAS = ['base', 'brillo', 'bronceador', 'iluminador', 'rubor', 'cejas', 'sombra', 'pestanas', 'labios'];
 const esperar = (ms) => new Promise((resolver) => setTimeout(resolver, ms));
 const menosMovimiento = () => globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
