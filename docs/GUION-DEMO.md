@@ -6,11 +6,14 @@
 - La hidratación se explora y se propone en vivo.
 - Los tres se implementan a la vez, cada uno en su propio worktree, y se archivan uno por uno.
 
+En los bloques de Codex, lo que empieza con `$openspec-` es un skill de OpenSpec y lo que empieza con `/` es un comando propio de Codex.
+
 ## Antes de la charla
 
 - [ ] `npm test` en verde y `npm start` funcionando en http://localhost:3000.
 - [ ] `openspec --version` responde y Codex CLI tiene la sesión iniciada.
-- [ ] Revisa en tu versión de Codex si tienes `/agents` o worktrees gestionados; si no, usa los worktrees de git de este guion.
+- [ ] En Codex, revisa con `/permissions` qué puede hacer sin preguntar y con `/status` el modelo y los permisos activos.
+- [ ] Prueba `/worktree` y `/agents` en tu versión. Si `/worktree` no está, usa los worktrees de git de este guion; `/agents` necesita un servidor compartido, local o remoto.
 - [ ] Terminal con fuente grande y cuatro pestañas: una principal y tres para los agentes.
 - [ ] Ensaya la demo completa al menos 3 veces y graba una corrida como respaldo.
 - [ ] Deja el repo limpio en `main` (ver "Limpiar después de ensayar").
@@ -30,9 +33,10 @@ Qué decir: "Dos capacidades vivas, dos cambios propuestos y un solo paso en el 
 
 ## 1. Explorar la hidratación (2 min)
 
-En Codex, en el repo principal:
+En Codex, en el repo principal. Primero adjunta la spec viva como contexto y luego explora:
 
 ```
+/mention openspec/specs/
 $openspec-explore Quiero el paso de hidratación: si la piel está muy seca, sérum; si no, crema humectante. ¿Qué decisiones faltan?
 ```
 
@@ -51,7 +55,13 @@ Decide en voz alta:
 $openspec-propose agregar-paso-hidratacion: seca, sérum y luego crema nutritiva; grasa, gel o crema ligera sin aceites; mixta, crema ligera y un poco más en las mejillas; normal, crema humectante ligera. En el avatar, brillo de piel hidratada más intenso en piel seca y más sutil en piel grasa.
 ```
 
-Muestra la carpeta `openspec/changes/agregar-paso-hidratacion/` y valida:
+Revisa en Codex lo que creó (es tu punto de control):
+
+```
+/diff
+```
+
+Luego, en la terminal, valida y guarda la propuesta:
 
 ```bash
 openspec validate agregar-paso-hidratacion
@@ -60,7 +70,7 @@ git add -A && git commit -m "Proponer el paso de hidratación"
 
 ## 3. Durante: tres agentes en paralelo (5 min)
 
-Crea un worktree por cambio (cada agente trabaja en su propia copia del repo):
+Cada agente trabaja en su propia copia del repo (un worktree). La forma nativa es `/worktree` dentro de Codex, que abre la conversación en un worktree gestionado. Si tu versión no lo tiene, créalos a mano:
 
 ```bash
 git worktree add ../demo-hidratacion -b paso-hidratacion
@@ -68,13 +78,14 @@ git worktree add ../demo-rubor -b paso-rubor
 git worktree add ../demo-labial -b paso-labial
 ```
 
-En cada pestaña, abre Codex en su worktree y aplica su cambio:
+En cada pestaña, abre Codex en su copia (`/worktree`, o `cd ../demo-rubor && codex`) y escribe:
 
-| Pestaña | Comandos |
-|---------|----------|
-| 1 | `cd ../demo-hidratacion && codex` → `$openspec-apply-change agregar-paso-hidratacion` |
-| 2 | `cd ../demo-rubor && codex` → `$openspec-apply-change agregar-paso-rubor` |
-| 3 | `cd ../demo-labial && codex` → `$openspec-apply-change agregar-paso-labial` |
+```
+$openspec-apply-change agregar-paso-rubor
+/goal Completa todas las tareas de openspec/changes/agregar-paso-rubor/tasks.md y deja npm test en verde
+```
+
+`/goal` mantiene al agente trabajando hasta cumplir el objetivo. Repite en las otras dos pestañas con `agregar-paso-hidratacion` y `agregar-paso-labial`. Si `/agents` funciona en tu versión, úsalo para mostrar los tres agentes desde un solo lugar.
 
 Mientras trabajan, desde la pestaña principal muestra el "durante":
 
@@ -85,11 +96,19 @@ cat ../demo-rubor/openspec/changes/agregar-paso-rubor/tasks.md   # las casillas 
 
 Qué decir: "Ninguno toca los archivos de los otros: cada paso es un archivo y una capacidad propia. Por eso pueden trabajar a la vez."
 
-Cuando cada agente termine, en su pestaña:
+Cuando cada agente termine, pídele que revise su propio trabajo:
+
+```
+/review
+```
+
+`/review` busca cambios de comportamiento y tests que faltan. Luego, en la terminal de esa copia:
 
 ```bash
 npm test && git add -A && git commit -m "Implementar el paso"
 ```
+
+Si usaste `/worktree`, integra la rama que Codex creó para cada copia en lugar de `paso-…` en el paso 4.
 
 ## 4. Después: integrar, ver y archivar (3 min)
 
@@ -102,16 +121,24 @@ npm start
 
 En el navegador: limpieza → hidratación → rubor (la brocha difumina en el color del tono elegido) → labial. Prueba con un tono claro y uno profundo para mostrar que cambian los colores.
 
-Archiva uno por uno y muestra cómo crece la spec viva:
+Archiva uno por uno desde Codex y muestra cómo crece la spec viva:
+
+```
+$openspec-archive-change agregar-paso-hidratacion
+$openspec-archive-change agregar-paso-rubor
+$openspec-archive-change agregar-paso-labial
+```
+
+En la terminal:
 
 ```bash
-openspec list --specs                          # 2 capacidades
-openspec archive agregar-paso-hidratacion -y
-openspec archive agregar-paso-rubor -y
-openspec archive agregar-paso-labial -y
-openspec list --specs                          # 5 capacidades
-ls openspec/changes/archive                    # el historial con fecha
+openspec list --specs          # 5 capacidades
+ls openspec/changes/archive    # el historial con fecha
 ```
+
+Si el tiempo apremia, el mismo archivo se hace en la terminal con `openspec archive <cambio> -y`. Para el siguiente cambio, empieza con `/new` en Codex: contexto limpio.
+
+Si el repo está conectado a Codex en GitHub, abre un pull request y comenta `@codex revisa este PR contra openspec/specs/` para cerrar con la revisión en la nube.
 
 Qué decir: "Lo que acordamos antes de escribir código es exactamente lo que quedó documentado después."
 
