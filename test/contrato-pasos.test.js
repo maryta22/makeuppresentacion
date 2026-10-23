@@ -4,6 +4,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { RECORRIDO, cargarPasos } from '../src/recorrido.js';
 import { TIPOS_PIEL, TONOS } from '../src/perfil.js';
+import { GUIAS } from '../src/avatar.js';
 
 const pasos = await cargarPasos();
 const perfiles = TONOS.flatMap((tono) => TIPOS_PIEL.map((tipo) => ({ tono: tono.id, tipo: tipo.id })));
@@ -21,5 +22,10 @@ for (const [id, paso] of pasos) {
       assert.ok(titulo && texto, `recomendación incompleta para ${perfil.tipo}`);
     }
     if ('aplicar' in paso) assert.equal(typeof paso.aplicar, 'function');
+    if ('guia' in paso) assert.ok(GUIAS.includes(paso.guia), `guía desconocida: ${paso.guia}`);
   });
 }
+
+test('hay una señalización para cada paso del recorrido', () => {
+  assert.deepEqual([...GUIAS].sort(), RECORRIDO.map((paso) => paso.id).sort());
+});

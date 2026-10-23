@@ -24,3 +24,7 @@ test('muestra espuma mientras dura y enjuague al terminar', () => {
   assert.equal(limpieza.efecto, 'espuma');
   assert.equal(limpieza.alTerminar, 'enjuague');
 });
+
+test('señaliza los movimientos circulares sobre el rostro', () => {
+  assert.equal(limpieza.guia, 'limpieza');
+});

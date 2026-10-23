@@ -122,6 +122,8 @@ function mostrarPaso(id) {
   $('#terminar').disabled = false;
 
   avatar.efecto(paso.efecto ?? null);
+  avatar.guia(paso.guia ?? null);
+  $('#leyenda').hidden = !paso.guia;
   paso.aplicar?.(avatar, estado.perfil);
   decir(paso.mensaje(estado.perfil));
   $('#paso-titulo').focus();
@@ -131,6 +133,7 @@ async function terminarPaso() {
   const paso = estado.pasos.get(estado.actual);
   $('#terminar').disabled = true;
   avatar.efecto(null);
+  avatar.guia(null);
   if (paso.alTerminar) await avatar.destello(paso.alTerminar);
   estado.hechos.add(paso.id);
 

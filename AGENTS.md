@@ -24,6 +24,7 @@ HTML, CSS y JavaScript (módulos ES) sin frameworks ni dependencias.
    - `mensaje(perfil)`: lo que dice el avatar
    - `consejos(perfil)`: lista de consejos
    - `recomendacion(perfil)`: `{ titulo, texto }`, adaptada al tipo de piel o al tono
+   - `guia`: el id del paso. Muestra sobre el avatar dónde aplicar y hacia dónde difuminar; las señalizaciones de los 12 pasos ya existen en `src/avatar.js`
    - Opcionales: `efecto` (efecto continuo del avatar), `alTerminar` (destello al terminar), `aplicar(avatar, perfil)` (maquillaje que queda puesto), `logro` (frase al cerrar)
 3. Para maquillar al avatar usa su API, sin editar el SVG:
    - `avatar.capa(nombre, { color, opacidad, grosor })` con las capas `base`, `brillo`, `bronceador`, `iluminador`, `rubor`, `cejas`, `sombra`, `pestanas`, `labios`

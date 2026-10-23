@@ -24,8 +24,9 @@ export default {
     texto: LIMPIADOR[perfil.tipo]
   }),
 
-  // Efecto del avatar mientras dura el paso y efecto breve al terminar.
+  // Efecto del avatar mientras dura el paso, señalización y efecto breve al terminar.
   efecto: 'espuma',
+  guia: 'limpieza',
   alTerminar: 'enjuague',
   logro: '¡Listo! Tu rostro quedó limpio y fresco.'
 };
