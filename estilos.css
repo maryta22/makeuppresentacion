@@ -518,7 +518,7 @@ body {
 
 .avatar .capa-brillo { opacity: var(--capa-brillo-opacidad, 0); transition: opacity 0.8s ease; mix-blend-mode: screen; }
 
-.avatar .capa-rubor { opacity: var(--capa-rubor-opacidad, 0); transition: opacity 0.8s ease; mix-blend-mode: multiply; }
+.avatar .capa-rubor { opacity: var(--capa-rubor-opacidad, 0); transition: opacity 0.8s ease; }
 .avatar .capa-rubor ellipse { fill: var(--capa-rubor-color, #E36F7E); }
 
 .avatar .capa-bronceador { opacity: var(--capa-bronceador-opacidad, 0); transition: opacity 0.8s ease; mix-blend-mode: multiply; }
