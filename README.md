@@ -40,3 +40,12 @@ El repo ya tiene OpenSpec inicializado para Codex, en español (`openspec init -
 | Archivar  | `$openspec-archive-change`  |
 
 La spec viva está en `openspec/specs/tutorial/` y `openspec/specs/paso-limpieza/`.
+
+## La demo
+
+Los pasos de rubor y labial ya están propuestos en `openspec/changes/`. El guion completo, con la hidratación propuesta en vivo y tres agentes en paralelo, está en [`docs/GUION-DEMO.md`](docs/GUION-DEMO.md).
+
+Ramas de respaldo:
+
+- `respaldo-propuestas`: los tres cambios propuestos (hidratación, rubor y labial).
+- `respaldo-final`: los tres pasos implementados y archivados.
